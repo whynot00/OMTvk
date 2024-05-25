@@ -1,13 +1,9 @@
-from template_html import TemplateHTML
-from additional_functions import time_of_function
+from gui import App
 
 
-@time_of_function
 def main():
-
-    temlplate = TemplateHTML("vk_dependence\\vk_template")
-    temlplate.get_template()
-
+    app = App()
+    app.mainloop()
+    
 if __name__ == "__main__":
     main()
-

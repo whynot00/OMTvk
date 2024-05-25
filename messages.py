@@ -3,17 +3,27 @@ import re, datetime
 from open_folder import OpenFolder
 
 class UserCorespondence(OpenFolder):
-    
-    def _get_messages(self, filename) -> dict:
-        
+
+    def _files_info(self, filename):
         self.data = list(map(self.__replace_brake, self._open_txt(filename)))
-               
+
         self.__suspect_name: dict = self.__get_suspect_name(self.data)
         self.__suspect_period: datetime = self.__get_suspect_period(self.data)
 
+        return self.__get_form_info(self.suspect_name, filename)
+
+    def _get_messages(self, filename) -> dict:
+
+        self._files_info(filename)
         self.__messages_dict = self._select_messages(self.data, self.__suspect_name)
 
         return self.__messages_dict
+        
+    def __get_form_info(self, name, path):
+        name = name["name"]
+        period = " - ".join(list(map(lambda string: string.split()[0], self.suspect_period)))
+        filename = re.search("(?<=\/)[\w\d0-1_\.\s-]*\.txt", path).group()
+        return name, period, filename
 
     def _select_messages(self, data, suspect_name) -> dict:
         """перебираем весь файл, получаем стартовые и конечные точки сообщения и формируем объект Message"""
@@ -58,8 +68,7 @@ class UserCorespondence(OpenFolder):
 
         return line
 
-    def __get_suspect_name(self, data: str) -> dict:
-        
+    def __get_suspect_name(self, data: str) -> None:
         for string in data:
             if re.search("^http[s]?://vk.com/[\w\d]+.+\(.+\)", string):
                 data = re.search("^http[s]?://vk.com/[\w\d]+.+\(.+\)", string).group()
@@ -71,13 +80,10 @@ class UserCorespondence(OpenFolder):
         return dict(zip(("name", "url"), (name, url)))
 
     def __get_suspect_period(self, data: list) -> datetime:
-        """сделать проверку лишних пробелов, возможно удаление всех \\n"""
-        
         for string in data:
             if re.search("Сообщения\sза\sпериод\s[\d.\s:-]+", string):
                 data = re.search("Сообщения\sза\sпериод\s[\d.\s:-]+", string).group()
                 break
-
 
         data = data.split()[3:]
         start_date = " ".join(data[:2])
@@ -174,7 +180,6 @@ class Message(UserCorespondence):
             self.__chat_id = data.split()[-1]
             name = f"Чат {self.__chat_id}"
             self.__is_chat = True
-
 
         if "Пользователь" in data:
             self.__is_user = True
@@ -323,7 +328,6 @@ class Message(UserCorespondence):
     
     @property
     def voice(self):
-        
         return self.__message_voice
     
     @property
