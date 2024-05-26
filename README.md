@@ -1,3 +1,5 @@
+![alt tag](https://img.shields.io/static/v1?message=Support&color=5db000&label=x32&labelColor=ffdc00&style=plastic) ![alt tag](https://img.shields.io/static/v1?message=Support&color=5db000&label=x64&labelColor=ffdc00&style=plastic)
+
 # Как пользоваться?
 
 1. Скачать версию подходящую под ваш ПК.
